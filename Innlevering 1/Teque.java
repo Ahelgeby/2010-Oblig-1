@@ -23,9 +23,10 @@ public class Teque {
                 get(Integer.parseInt(line[1]));
             }
         }
-        Long finish = System.nanoTime();
-        Long timeElapsed = (finish - start) / 1000000;
-        //System.out.println(timeElapsed);
+        sc.close();
+        // Long finish = System.nanoTime();
+        // Long timeElapsed = (finish - start) / 1000000;
+        // System.out.println(timeElapsed);
     }
     
 
@@ -127,15 +128,26 @@ public class Teque {
         }
         else if(size == 1){
             Node node = new Node<>(x);
-            middle = last = node;
             first.next = node;
-            middle.previous = first;
-            last.previous = first;
+            node.previous = first;
+            middle = last = node;
+            size++;
+            return;
+        }
+        else if(size == 2){
+            Node node = new Node<>(x);
+            first.next = node;
+            node.previous = first;
+            node.next = last;
+            last.previous = node;
+            middle = node;
             size++;
             return;
         }
         else if(isEven(size)){ // nytt element skal settes inn til venstre for nåværende midtpeker fordi size på innsetningstidspunktet var et partall
             // System.out.println("Size: " + size);
+            // System.out.println("Current middle: " + middle.data);
+            // System.out.println("Size: " + size + "Number to be added: " + x);
             Node node = new Node<>(x);
             node.previous = middle.previous;
             node.previous.next = node;
@@ -151,6 +163,7 @@ public class Teque {
             node.next = middle.next;
             middle.next = node;
             node.next.previous = node;
+            middle = node;
             size++;
             return;
         }
