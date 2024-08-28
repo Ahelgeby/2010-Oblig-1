@@ -7,6 +7,9 @@ public class Teque {
     static int size = 0;
     static int numberOfIterations;
 
+    //Main metoden leser fra inputfilene og avgjør antall metodekall som skal utføres med "numberOfIterations".
+    // Strengen i inputfilen splittes i 2 og kaller på en av de fire metodene basert på første element som forekommer av .split(), og sender inn split[1] som argument for metoden.
+
     public static void main(String[] args){
         Long start = System.nanoTime();
         Scanner sc = new Scanner(System.in);
@@ -24,14 +27,16 @@ public class Teque {
             }
         }
         sc.close();
-        // Long finish = System.nanoTime();
-        // Long timeElapsed = (finish - start) / 1000000;
-        // System.out.println(timeElapsed);
+        Long finish = System.nanoTime();
+        Long timeElapsed = (finish - start) / 1000000;
+        System.out.println(timeElapsed);
     }
     
 
-    //Metoden sjekker om køen allerede er tom, og setter oppretter en node som holder på elementet x på køens første og siste plass. 
-    //Dersom det finnes elementer i køen opprettes det en node som får første - referansen, og kobles til det elementet som var først i køen før metodekallet via nodens "next" variabel.
+    //Vil sette inn et element fremst i listen, spesielle caser på 0,1 elementer i listen som krever spesialhåndtering av nodereferanser.
+    //Utover dette vil det forårsake en venstreforskyvning av middle referansen dersom det skal settes inn et nytt element fremst, når size er et partall.
+    //Dersom ingen av casene inntreffer foregår innsetting som normalt. 
+
     public static void pushFront(int x){
         if(first == last && first == null){
             first = last = middle = new Node<>(x);
@@ -47,14 +52,14 @@ public class Teque {
             return;
         }
         else{
-            if(isEven(size)){
-            Node node = new Node<>(x);
-            node.next = first;
-            first.previous = node;
-            first = node;
-            middle = middle.previous;
-            size ++;
-            return;
+            if(isEven(size)){           //Dersom det er et partall antall elementer i listen ved innsetting må middle referansen flyttes ett hakk til venstre
+                Node node = new Node<>(x);
+                node.next = first;
+                first.previous = node;
+                first = node;
+                middle = middle.previous;
+                size ++;
+                return;
             }
             Node node = new Node<>(x);
             node.next = first;
@@ -65,8 +70,10 @@ public class Teque {
         }
     }
 
-    //Metoden sjekker om køen er tom, og i dette tilfellet oppretter en ny node som holder på elementet x og setter dette på første og siste plass i køen. 
-    //Dersom det finnes elementer i køen vil det opprettes en node som får siste referansen og kobles til elementet som tidligere var sist via nodens next referanse
+    //Setter et element bakerst inn i listen, spesiell edge-case på 0,1 elementer som krever spesielhåndtering av nodereferanser.
+    //Utover dette vil det skape en høyreforskyvning av "middle" noden dersom det er et oddetall antall elementer i listen ved innsetting.
+    //Dersom det er et partall antall noder i listen vil det ikke forårsake noen forskyvning. 
+
     public static void pushBack(int x){
         if(first == last && first == null){
             first = last = middle = new Node<>(x);
@@ -82,17 +89,16 @@ public class Teque {
             size++;
             return;
         }else{
-            if(!isEven(size)){
-            Node node = new Node<>(x);
-            middle = middle.next;
-            last.next = node;
-            node.previous = last;
-            last = node;
-            size++;
-            //System.out.println("la til node bakerst " + node.data);
-            return;
+            if(!isEven(size)){              //Dersom size er et oddetall vil det være behov for å flytte middle referansen ett hakk til høyre
+                Node node = new Node<>(x);
+                middle = middle.next;
+                last.next = node;
+                node.previous = last;
+                last = node;
+                size++;
+                return;
             }
-            Node node = new Node<>(x);
+            Node node = new Node<>(x);      //Dersom ingen av casene over inntreffer vil innsetting foregå som normalt. 
             last.next = node;
             node.previous = last;
             last = node;
@@ -101,25 +107,17 @@ public class Teque {
         }
     }
 
-    //Hjelpemetode for å få tak i elementene på en en gitt index i køen, brukes i pushMiddle. Metoden tar inn en index, starter med det første elementet i køen og oppdaterer pekeren til neste node "index" ganger 
-    //Til den kommer frem til den aktuelle noden 
-
-    private static Node retrieve(int index){
-        Node pointer = first;
-        for (int i = 0; i <index  ; i++){
-            pointer = pointer.next;
-        }
-        return pointer;
-    }
     private static boolean isEven(int x){ //Brukes til å å se om indexen neste node skal settes inn på er et partall eller oddetall
-        if(x % 2 == 0){             //Tar inn size på listen som x
+        if(x % 2 == 0){                   //Tar inn size på listen som x
             return true;
         }else{
             return false;
         }
     }
 
-    public static void pushMiddle(int x){
+    //vil sette inn et element i midten av listen, noen edge cases som 0,1 og 2 elementer krever spesialhåndtering av nodereferanser.
+    //Utover dette vil det skape en venstreforskyvning dersom det skal settes noe inn i midten når size er et partall, og en høyreforskyvning når size er et oddetall.
+    public static void pushMiddle(int x){               
         int index = ((size +1)/2);
         if (size == 0){
             first = middle = last = new Node<>(x);
@@ -145,9 +143,6 @@ public class Teque {
             return;
         }
         else if(isEven(size)){ // nytt element skal settes inn til venstre for nåværende midtpeker fordi size på innsetningstidspunktet var et partall
-            // System.out.println("Size: " + size);
-            // System.out.println("Current middle: " + middle.data);
-            // System.out.println("Size: " + size + "Number to be added: " + x);
             Node node = new Node<>(x);
             node.previous = middle.previous;
             node.previous.next = node;
@@ -170,14 +165,21 @@ public class Teque {
 
     }
     
-    //Gjør ca det samme som retrieve, men skriver ut tallet som noden på aktuell index holder på, istedenfor å returnere node objektet
     public static void get(int index){
-        // System.out.println("Size: " + size);
-        Node pointer = first;
-        for (int i = 0; i<index ;i++){
-            pointer = pointer.next;
+        if(index > ((size +1)/2)){
+            int breakpoint = index-((size+1)/2);
+            Node pointer = middle;
+            for(int i = 0; i<breakpoint -1;i++){
+                pointer = pointer.next;
+            }
+            System.out.println(pointer.data);
+        }else{
+            Node pointer = first;
+            for(int i = 0; i<index; i++){
+                pointer=pointer.next;
+            }
+            System.out.println(pointer.data);
         }
-        System.out.println(pointer.data);
     }
 
 
