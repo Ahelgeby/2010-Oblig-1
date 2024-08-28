@@ -3,10 +3,12 @@ import java.util.Scanner;
 public class Teque {
     static Node first;
     static Node last;
-    static int size;
+    static Node middle;
+    static int size = 0;
     static int numberOfIterations;
 
     public static void main(String[] args){
+        Long start = System.nanoTime();
         Scanner sc = new Scanner(System.in);
         numberOfIterations = Integer.parseInt(sc.nextLine());
         for(int i= 0; i<numberOfIterations; i++){
@@ -21,29 +23,43 @@ public class Teque {
                 get(Integer.parseInt(line[1]));
             }
         }
+        Long finish = System.nanoTime();
+        Long timeElapsed = (finish - start) / 1000000;
+        //System.out.println(timeElapsed);
     }
     
 
-    public Teque(){
-        first = last = null;
-        size = 0;
-    }
     //Metoden sjekker om køen allerede er tom, og setter oppretter en node som holder på elementet x på køens første og siste plass. 
     //Dersom det finnes elementer i køen opprettes det en node som får første - referansen, og kobles til det elementet som var først i køen før metodekallet via nodens "next" variabel.
     public static void pushFront(int x){
         if(first == last && first == null){
-            first = last = new Node<>(x);
+            first = last = middle = new Node<>(x);
             size ++;
-            //System.out.println("La til node i pos 0" + first.data);
+            return;
+        }
+        else if(size == 1){
+            Node node = new Node<>(x);
+            node.next = first;
+            first.previous = node;
+            first = node;
+            size++;
             return;
         }
         else{
+            if(isEven(size)){
+            Node node = new Node<>(x);
+            node.next = first;
+            first.previous = node;
+            first = node;
+            middle = middle.previous;
+            size ++;
+            return;
+            }
             Node node = new Node<>(x);
             node.next = first;
             first.previous = node;
             first = node;
             size ++;
-            //System.out.println("La til node forran" + node.data);
             return;
         }
     }
@@ -52,18 +68,34 @@ public class Teque {
     //Dersom det finnes elementer i køen vil det opprettes en node som får siste referansen og kobles til elementet som tidligere var sist via nodens next referanse
     public static void pushBack(int x){
         if(first == last && first == null){
-            first = last = new Node<>(x);
+            first = last = middle = new Node<>(x);
             size ++;
             //System.out.println("la til node på pos 0 " + first.data);
             return;
         }
-        else{
+        else if(size == 1){
             Node node = new Node<>(x);
+            node.previous = first;
+            first.next = node;
+            middle = last = node;
+            size++;
+            return;
+        }else{
+            if(!isEven(size)){
+            Node node = new Node<>(x);
+            middle = middle.next;
             last.next = node;
             node.previous = last;
             last = node;
             size++;
             //System.out.println("la til node bakerst " + node.data);
+            return;
+            }
+            Node node = new Node<>(x);
+            last.next = node;
+            node.previous = last;
+            last = node;
+            size++;
             return;
         }
     }
@@ -78,39 +110,56 @@ public class Teque {
         }
         return pointer;
     }
-    //Sjekker om køen er tom, hvis dette er tilfellet fungerer dette likt som pushFront og pushBack
-    //Deretter sjekkes det om det er nøyaktig ett element i køen, hvis dette er tilfellet settes elementet sist i køen i henhold til formelen "Size + 1 / 2" = index 1. I dette tilfellet er det det samme som å sette
-    //Noe på siste plass i køen. 
-    //Dersom det er mer enn ett element i køen bruker metoden retrieve(index) for å hente de aktuelle nodene i køen som ligger hhv. forran og bak der noden skal settes inn, og kobler riktige referanser.
+    private static boolean isEven(int x){ //Brukes til å å se om indexen neste node skal settes inn på er et partall eller oddetall
+        if(x % 2 == 0){             //Tar inn size på listen som x
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static void pushMiddle(int x){
-        if(first == last && first == null){
-            first = last = new Node<>(x);
-            size ++;
-            //System.out.println("la til node i først " + first.data);
+        int index = ((size +1)/2);
+        if (size == 0){
+            first = middle = last = new Node<>(x);
+            size++;
             return;
         }
-        else if(first == last && first != null){
-            pushBack(x);
+        else if(size == 1){
+            Node node = new Node<>(x);
+            middle = last = node;
+            first.next = node;
+            middle.previous = first;
+            last.previous = first;
+            size++;
             return;
         }
-        else{
-            Node node = new Node<> (x);
-            int index = ((size +1) /2);
-            Node temp = retrieve(index);
-            node.previous = temp.previous;
-            node.next = temp;
+        else if(isEven(size)){ // nytt element skal settes inn til venstre for nåværende midtpeker fordi size på innsetningstidspunktet var et partall
+            // System.out.println("Size: " + size);
+            Node node = new Node<>(x);
+            node.previous = middle.previous;
             node.previous.next = node;
+            node.next = middle;
+            middle.previous = node;
+            middle = node;
+            size ++;
+            return;
+        }
+        else if(!isEven(size)){ //nytt element skal settes inn til høyre for nåværende midtpeker fordi size på innsetningstidspunktet var et oddetall
+            Node node = new Node<>(x);
+            node.previous = middle;
+            node.next = middle.next;
+            middle.next = node;
             node.next.previous = node;
             size++;
-            //System.out.println("la til node i midten " + node.data);
             return;
-
         }
 
-        }
+    }
     
     //Gjør ca det samme som retrieve, men skriver ut tallet som noden på aktuell index holder på, istedenfor å returnere node objektet
     public static void get(int index){
+        // System.out.println("Size: " + size);
         Node pointer = first;
         for (int i = 0; i<index ;i++){
             pointer = pointer.next;
