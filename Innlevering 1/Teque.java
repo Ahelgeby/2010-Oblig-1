@@ -14,7 +14,7 @@ public class Teque {
         Long start = System.nanoTime();
         Scanner sc = new Scanner(System.in);
         numberOfIterations = Integer.parseInt(sc.nextLine());
-        for(int i= 0; i<numberOfIterations; i++){
+        for(int i = 0; i<numberOfIterations; i++){
             String[] line = sc.nextLine().split(" ");
             if(line[0].equals("push_front")){
                 pushFront(Integer.parseInt(line[1]));
@@ -29,7 +29,7 @@ public class Teque {
         sc.close();
         Long finish = System.nanoTime();
         Long timeElapsed = (finish - start) / 1000000;
-        System.out.println(timeElapsed);
+        // System.out.println(timeElapsed);
     }
     
 
@@ -166,21 +166,20 @@ public class Teque {
     }
     
     public static void get(int index){
-        if(index > ((size +1)/2)){
-            int breakpoint = index-((size+1)/2);
-            Node pointer = middle;
-            for(int i = 0; i<breakpoint -1;i++){
-                pointer = pointer.next;
-            }
-            System.out.println(pointer.data);
-        }else{
+        // if(index > ((size /2))){                     // Er noe feil i denne, det må fikses fordi det gjør programmet dobbelt så tregt
+        //     int breakpoint = index-((size+1)/2);
+        //     Node pointer = middle;
+        //     for(int i = 0; i<breakpoint + 1;i++){
+        //         pointer = pointer.next;
+        //     }
+        //     System.out.println(pointer.data);
+        // }else{
             Node pointer = first;
-            for(int i = 0; i<index; i++){
+            for(int i = 0; i<index ; i++){
                 pointer=pointer.next;
             }
             System.out.println(pointer.data);
         }
-    }
 
 
 
