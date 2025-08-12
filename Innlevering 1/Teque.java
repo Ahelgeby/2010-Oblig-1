@@ -70,9 +70,6 @@ public class Teque {
         }
     }
 
-    //Setter et element bakerst inn i listen, spesiell edge-case på 0,1 elementer som krever spesielhåndtering av nodereferanser.
-    //Utover dette vil det skape en høyreforskyvning av "middle" noden dersom det er et oddetall antall elementer i listen ved innsetting.
-    //Dersom det er et partall antall noder i listen vil det ikke forårsake noen forskyvning. 
 
     public static void pushBack(int x){
         if(first == last && first == null){
